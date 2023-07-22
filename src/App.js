@@ -1,13 +1,9 @@
 import styles from "./App.module.css";
 import { useState } from "react";
-import {
-  useRequestGetTodo,
-  useRequestAddTodo,
-  useRequestDeleteTodo,
-  useRequestEditTodoTitle,
-  useRequestEditTodoDescription,
-} from "./hooks";
-import { TaskBlockLayout, FinderLayout } from "./layout";
+import { useRequestGetTodo, useRequestAddTodo } from "./hooks";
+import { AppContext } from "./context";
+import { Navbar, TodosArea } from "./components";
+import { byField } from "./features/byfield";
 
 function App() {
   const [todosList, setTodosList] = useState([]);
@@ -30,10 +26,33 @@ function App() {
     setIsUpdate,
     isUpdate
   );
-  const requestEditTodoTitle = useRequestEditTodoTitle();
-  const requestEditTodoDescription = useRequestEditTodoDescription();
-  const requestDeleteTodo = useRequestDeleteTodo();
 
+  const dispatch = (action) => {
+    const { type, payload } = action;
+    switch (type) {
+      case "SET_ENABLE_SORT": {
+        setEnableSort(payload);
+        break;
+      }
+      case "SET_IS_LOADING": {
+        setIsLoading(payload);
+        break;
+      }
+      case "SET_FINDER_VALUE": {
+        setFinderValue(payload);
+        break;
+      }
+      case "SET_NEW_TODO_DATA": {
+        setNewTodoData(payload);
+        break;
+      }
+      case "SET_IS_UPDATE": {
+        setIsUpdate(payload);
+        break;
+      }
+      default:
+    }
+  };
   const finder = (finderValue) => {
     return todosList.filter(
       (value) =>
@@ -41,11 +60,8 @@ function App() {
         value.description.toLowerCase().includes(finderValue.toLowerCase())
     );
   };
-  const filteredItems = finderValue ? finder(finderValue) : todosList;
 
-  function byField(field) {
-    return (a, b) => (a[field] > b[field] ? 1 : -1);
-  }
+  const filteredItems = finderValue ? finder(finderValue) : todosList;
 
   const sorted = enableSort
     ? filteredItems.sort(byField("title"))
@@ -57,76 +73,20 @@ function App() {
         <div className={styles.loader}></div>
       ) : (
         <div className={styles.container}>
-          <div className={styles.inputBlock}>
-            <TaskBlockLayout createTodo={createTodo} />
-            <h1>TODO List</h1>
-            <FinderLayout
-              finderValue={finderValue}
-              setFinderValue={setFinderValue}
-            />
-          </div>
-          <button
-            className={styles.sortButton}
-            onClick={() => {
-              setEnableSort(!enableSort);
-              setIsUpdate(!isUpdate);
+          <AppContext.Provider
+            value={{
+              newTodoData,
+              finderValue,
+              sorted,
+              createTodo,
+              enableSort,
+              isUpdate,
+              dispatch,
             }}
           >
-            {!enableSort ? `Сортировать по алфавиту` : `Сортировать по порядку`}
-          </button>
-          {
-            <div className={styles.todoContainer}>
-              {filteredItems.map(({ id, title, description }) => {
-                return (
-                  <div className={styles.todoCard} key={id}>
-                    <div className={styles.title}>
-                      <button
-                        className={styles.removeButton}
-                        onClick={() => {
-                          requestDeleteTodo(id, title, isUpdate, setIsUpdate);
-                        }}
-                      >
-                        x
-                      </button>
-                      <input
-                        type="text"
-                        defaultValue={title}
-                        placeholder="Заголовок"
-                        onChange={({ target }) => {
-                          setNewTodoData({
-                            ...newTodoData,
-                            title: target.value,
-                          });
-                        }}
-                        onBlur={() =>
-                          requestEditTodoTitle(id, newTodoData.title)
-                        }
-                      />
-                    </div>
-                    <div className={styles.todoCardDescription}>
-                      <input
-                        type="text"
-                        defaultValue={description}
-                        placeholder="Описание задачи"
-                        onChange={({ target }) => {
-                          setNewTodoData({
-                            ...newTodoData,
-                            description: target.value,
-                          });
-                        }}
-                        onBlur={() =>
-                          requestEditTodoDescription(
-                            id,
-                            newTodoData.description
-                          )
-                        }
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          }
+            <Navbar />
+            <TodosArea />
+          </AppContext.Provider>
         </div>
       )}
     </div>
