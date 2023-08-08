@@ -1,11 +1,14 @@
 import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { selectIsUpdate } from "../selectors";
+import { setIsLoading, fetchData } from "../actions";
+export const useRequestGetTodo = () => {
+  const isUpdate = useSelector(selectIsUpdate);
+  const dispatch = useDispatch();
 
-export const useRequestGetTodo = (setIsLoading, setTodosList, isUpdate) => {
   useEffect(() => {
-    setIsLoading(true);
-    fetch("http://localhost:3005/todos")
-      .then((loadedData) => loadedData.json())
-      .then((loadedTodos) => setTodosList(loadedTodos))
-      .finally(() => setIsLoading(false));
+    dispatch(setIsLoading(true));
+    dispatch(fetchData());
+    dispatch(setIsLoading(false));
   }, [isUpdate]);
 };

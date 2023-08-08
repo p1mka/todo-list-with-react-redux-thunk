@@ -1,15 +1,19 @@
-import { useContext } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styles from "../../App.module.css";
-import { AppContext } from "../../context";
 import { TaskBlockLayout } from "../../layout";
+import { selectIsUpdate } from "../../selectors";
+import { selectEnableSort } from "../../selectors/select-enable-sort";
 import { FinderBar } from "./Finder-bar/Finder-bar";
+import { setEnableSort, setIsUpdate } from "../../actions";
 
 export const Navbar = () => {
-  const { enableSort, isUpdate, dispatch } = useContext(AppContext);
+  const enableSort = useSelector(selectEnableSort);
+  const isUpdate = useSelector(selectIsUpdate);
+  const dispatch = useDispatch();
 
   const onSortButtonClick = () => {
-    dispatch({ type: "SET_ENABLE_SORT", payload: !enableSort });
-    dispatch({ type: "SET_IS_UPDATE", payload: !isUpdate });
+    dispatch(setEnableSort(!enableSort));
+    dispatch(setIsUpdate(!isUpdate));
   };
 
   return (

@@ -1,23 +1,20 @@
-import { useContext } from "react";
-import { AppContext } from "../../../../context";
 import { useRequestEditTodoDescription } from "../../../../hooks";
-import { TodoAreaContext } from "../../context";
 import styles from "../../../../App.module.css";
+import { useDispatch, useSelector } from "react-redux";
+import { selectNewTodoData } from "../../../../selectors";
+import { setNewTodoDataDescription } from "../../../../actions";
 
-export const TodoDescription = () => {
-  const { dispatch, newTodoData } = useContext(AppContext);
-  const { id, description } = useContext(TodoAreaContext);
+export const TodoDescription = ({ id, description }) => {
+  const dispatch = useDispatch();
+  const newTodoData = useSelector(selectNewTodoData);
 
-  const requestEditTodoDescription = useRequestEditTodoDescription();
+  const { requestEditTodoDescription } = useRequestEditTodoDescription(
+    id,
+    newTodoData.description
+  );
 
   const onDescriptionChange = ({ target }) => {
-    dispatch({
-      type: "SET_NEW_TODO_DATA",
-      payload: {
-        ...newTodoData,
-        description: target.value,
-      },
-    });
+    dispatch(setNewTodoDataDescription(target.value));
   };
 
   return (
@@ -27,7 +24,7 @@ export const TodoDescription = () => {
         defaultValue={description}
         placeholder="Описание задачи"
         onChange={onDescriptionChange}
-        onBlur={() => requestEditTodoDescription(id, newTodoData.description)}
+        onBlur={requestEditTodoDescription}
       />
     </div>
   );

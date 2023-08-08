@@ -1,12 +1,14 @@
 import styles from "./Finder-block.module.css";
-import { useContext } from "react";
-import { AppContext } from "../../../context";
+import { useDispatch, useSelector } from "react-redux";
+import { selectFinderValue } from "../../../selectors";
+import { setFinderValue } from "../../../actions";
 
 export const FinderBar = () => {
-  const { finderValue, dispatch } = useContext(AppContext);
+  const dispatch = useDispatch();
+  const finderValue = useSelector(selectFinderValue);
 
   const onFinderValueChange = ({ target }) => {
-    dispatch({ type: "SET_FINDER_VALUE", payload: target.value });
+    dispatch(setFinderValue(target.value));
   };
 
   return (

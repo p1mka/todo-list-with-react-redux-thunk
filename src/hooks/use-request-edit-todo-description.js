@@ -1,5 +1,5 @@
-export const useRequestEditTodoDescription = () => {
-  const requestEditTodoDescription = (id, description) => {
+export const useRequestEditTodoDescription = (id, description) => {
+  const requestEditTodoDescription = () => {
     fetch(`http://localhost:3005/todos/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json;charset=utf-8" },
@@ -8,5 +8,5 @@ export const useRequestEditTodoDescription = () => {
       }),
     });
   };
-  return requestEditTodoDescription;
+  return { requestEditTodoDescription };
 };

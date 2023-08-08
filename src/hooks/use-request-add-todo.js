@@ -1,16 +1,12 @@
-export const useRequestAddTodo = (
-  setIsLoading,
-  newTodoData,
-  setNewTodoData,
-  setIsUpdate,
-  isUpdate
-) => {
-  const createTodo = () => {
-    requestAddTodo();
-  };
+import { useDispatch, useSelector } from "react-redux";
+import { setIsUpdate } from "../actions";
+import { selectIsUpdate } from "../selectors";
+
+export const useRequestAddTodo = () => {
+  const isUpdate = useSelector(selectIsUpdate);
+  const dispatch = useDispatch();
+
   const requestAddTodo = () => {
-    setIsLoading(true);
-    setNewTodoData({ ...newTodoData, title: "", description: "" });
     fetch("http://localhost:3005/todos", {
       method: "POST",
       headers: { "Content-Type": "application/json;charset=utf-8" },
@@ -18,14 +14,10 @@ export const useRequestAddTodo = (
         title: "",
         description: "",
       }),
-    })
-      .then(() => {
-        setIsUpdate(!isUpdate);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    }).then(() => {
+      dispatch(setIsUpdate(!isUpdate));
+    });
   };
 
-  return createTodo;
+  return { requestAddTodo };
 };

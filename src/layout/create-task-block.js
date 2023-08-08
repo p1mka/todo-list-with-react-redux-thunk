@@ -1,11 +1,10 @@
-import { useContext } from "react";
-import { AppContext } from "../context";
+import { useRequestAddTodo } from "../hooks";
 
 export const TaskBlockLayout = () => {
-  const { createTodo } = useContext(AppContext);
+  const { requestAddTodo } = useRequestAddTodo();
 
   return (
-    <button type="submit" onClick={createTodo}>
+    <button type="submit" onClick={requestAddTodo}>
       +
     </button>
   );

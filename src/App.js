@@ -1,58 +1,23 @@
 import styles from "./App.module.css";
-import { useState } from "react";
-import { useRequestGetTodo, useRequestAddTodo } from "./hooks";
-import { AppContext } from "./context";
+import { useRequestGetTodo } from "./hooks";
 import { Navbar, TodosArea } from "./components";
 import { byField } from "./features/byfield";
+import { useSelector } from "react-redux";
+import {
+  selectIsLoading,
+  selectEnableSort,
+  selectTodosList,
+  selectFinderValue,
+} from "./selectors";
 
 function App() {
-  const [todosList, setTodosList] = useState([]);
-  const [newTodoData, setNewTodoData] = useState({
-    id: "",
-    title: "",
-    description: "",
-  });
-  const [isUpdate, setIsUpdate] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [finderValue, setFinderValue] = useState("");
-  const [enableSort, setEnableSort] = useState(false);
+  useRequestGetTodo();
 
-  useRequestGetTodo(setIsLoading, setTodosList, isUpdate);
+  const enableSort = useSelector(selectEnableSort);
+  const isLoading = useSelector(selectIsLoading);
+  const todosList = useSelector(selectTodosList);
+  const finderValue = useSelector(selectFinderValue);
 
-  const createTodo = useRequestAddTodo(
-    setIsLoading,
-    newTodoData,
-    setNewTodoData,
-    setIsUpdate,
-    isUpdate
-  );
-
-  const dispatch = (action) => {
-    const { type, payload } = action;
-    switch (type) {
-      case "SET_ENABLE_SORT": {
-        setEnableSort(payload);
-        break;
-      }
-      case "SET_IS_LOADING": {
-        setIsLoading(payload);
-        break;
-      }
-      case "SET_FINDER_VALUE": {
-        setFinderValue(payload);
-        break;
-      }
-      case "SET_NEW_TODO_DATA": {
-        setNewTodoData(payload);
-        break;
-      }
-      case "SET_IS_UPDATE": {
-        setIsUpdate(payload);
-        break;
-      }
-      default:
-    }
-  };
   const finder = (finderValue) => {
     return todosList.filter(
       (value) =>
@@ -73,20 +38,8 @@ function App() {
         <div className={styles.loader}></div>
       ) : (
         <div className={styles.container}>
-          <AppContext.Provider
-            value={{
-              newTodoData,
-              finderValue,
-              sorted,
-              createTodo,
-              enableSort,
-              isUpdate,
-              dispatch,
-            }}
-          >
-            <Navbar />
-            <TodosArea />
-          </AppContext.Provider>
+          <Navbar />
+          <TodosArea sorted={sorted} />
         </div>
       )}
     </div>

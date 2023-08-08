@@ -1,41 +1,33 @@
-import { useContext } from "react";
 import styles from "../../../../App.module.css";
-import { AppContext } from "../../../../context";
-import { TodoAreaContext } from "../../context";
-import { useRequestDeleteTodo } from "../../../../hooks";
-import { useRequestEditTodoTitle } from "../../../../hooks";
+import {
+  useRequestDeleteTodo,
+  useRequestEditTodoTitle,
+} from "../../../../hooks";
+import { useDispatch, useSelector } from "react-redux";
+import { selectNewTodoData } from "../../../../selectors";
+import { setNewTodoDataTitle } from "../../../../actions";
 
-export const TodoTitle = () => {
-  const { dispatch, newTodoData } = useContext(AppContext);
-  const { id, title } = useContext(TodoAreaContext);
+export const TodoTitle = ({ id, title }) => {
+  const dispatch = useDispatch();
+  const newTodoData = useSelector(selectNewTodoData);
 
-  const requestDeleteTodo = useRequestDeleteTodo();
-  const requestEditTodoTitle = useRequestEditTodoTitle();
-
+  const { requestDeleteTodo } = useRequestDeleteTodo(id, title);
+  const { requestEditTodoTitle } = useRequestEditTodoTitle(
+    id,
+    newTodoData.title
+  );
   const onTitleChange = ({ target }) =>
-    dispatch({
-      type: "SET_NEW_TODO_DATA",
-      payload: {
-        ...newTodoData,
-        title: target.value,
-      },
-    });
+    dispatch(setNewTodoDataTitle(target.value));
 
   return (
     <div className={styles.title}>
-      <button
-        onClick={() => {
-          requestDeleteTodo(id, title);
-        }}
-      >
-        🗑
-      </button>
+      <button onClick={requestDeleteTodo}>🗑</button>
       <input
         type="text"
         defaultValue={title}
         placeholder="Заголовок"
         onChange={onTitleChange}
-        onBlur={() => requestEditTodoTitle(id, newTodoData.title)}
+        onBlur={requestEditTodoTitle}
       />
     </div>
   );
